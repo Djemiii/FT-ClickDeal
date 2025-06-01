@@ -5,18 +5,19 @@ import { useState } from "react"
 import { Gift, MapPin, Clock, Star, TrendingUp, Search } from "lucide-react"
 import { useCoupons } from "../../hooks/useCoupons"
 import { useSpinHistory } from "../../hooks/useSpin"
-import CouponOverlay from "../CouponOverlay"
+import CouponOverlay from "../shared/CouponOverlay"
 
 const ConsumerDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("")
   const [location, setLocation] = useState("")
 
-  const { data: coupons, isLoading } = useCoupons({
+  const { data: couponsAll, isLoading } = useCoupons({
     search: searchTerm,
     category: selectedCategory,
     location: location,
   })
+  const coupons = Array.isArray(couponsAll?.data) ? couponsAll.data : []
   const { data: spinHistory } = useSpinHistory()
 
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -51,7 +52,7 @@ const ConsumerDashboard: React.FC = () => {
       </div>
 
       {/* Statistiques utilisateur */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 hidden gap-6 mb-8">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">

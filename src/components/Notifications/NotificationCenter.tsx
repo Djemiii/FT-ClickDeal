@@ -11,7 +11,8 @@ import {
 } from "../../hooks/useNotifications"
 
 const NotificationCenter: React.FC = () => {
-  const { data: notifications, isLoading } = useNotifications()
+  const { data: notificationsData, isLoading } = useNotifications()
+  const notifications =Array.isArray(notificationsData?.notifications) ? notificationsData?.notifications : []
   const markAsRead = useMarkNotificationRead()
   const markAllAsRead = useMarkAllNotificationsRead()
   const deleteNotification = useDeleteNotification()
@@ -135,7 +136,7 @@ console.log(notifications);
             </div>
           ) : (
             <div className="space-y-4">
-              {notifications.map((notification) => (
+              {Array.isArray(notifications) && notifications.map((notification) => (
                 <div
                   key={notification._id}
                   className={`border rounded-lg p-4 transition-all hover:shadow-md ${getNotificationBg(

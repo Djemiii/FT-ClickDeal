@@ -7,7 +7,7 @@ import { useMyCoupons, useDeleteCoupon } from "../../../hooks/useCoupons"
 import EditCouponModal from "./EditCouponModal"
 import CreateCouponModal from "./CreateCouponModal"
 
-const MyCouponsPage: React.FC = () => {
+const MyCouponsConsumerPage: React.FC = () => {
   const { data: coupons, isLoading } = useMyCoupons()
   const deleteCoupon = useDeleteCoupon()
 
@@ -60,13 +60,13 @@ const MyCouponsPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Mes Coupons</h1>
             <p className="text-gray-600">Gérez tous vos coupons et suivez leurs performances</p>
           </div>
-          <button
+          {/* <button
             onClick={() => setShowCreateModal(true)}
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nouveau coupon
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -177,21 +177,21 @@ const MyCouponsPage: React.FC = () => {
             <div className="text-center py-12">
               <Tag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {coupons?.length === 0 ? "Aucun coupon créé" : "Aucun coupon trouvé"}
+                {coupons?.length === 0 ? "Aucun coupon " : "Aucun coupon trouvé"}
               </h3>
               <p className="text-gray-600 mb-6">
                 {coupons?.length === 0
-                  ? "Commencez par créer votre premier coupon pour attirer plus de clients."
+                  ? ""
                   : "Essayez de modifier vos critères de recherche."}
               </p>
-              {coupons?.length === 0 && (
+              {/* {coupons?.length === 0 && (
                 <button
                   onClick={() => (window.location.href = "/dashboard?tab=create-coupon")}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Créer mon premier coupon
                 </button>
-              )}
+              )} */}
             </div>
           ) : (
             <div className="space-y-4">
@@ -309,4 +309,4 @@ const MyCouponsPage: React.FC = () => {
   )
 }
 
-export default MyCouponsPage
+export default MyCouponsConsumerPage

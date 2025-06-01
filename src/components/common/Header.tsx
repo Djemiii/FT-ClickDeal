@@ -34,6 +34,13 @@ const Header: React.FC = () => {
             <Link to="/fortune-wheel" className="text-gray-700 hover:text-blue-800 transition-colors">
               Roue de la Fortune
             </Link>
+             <Link to="/enterprise" className="text-gray-700 hover:text-blue-800 transition-colors">
+             Entreprise
+            </Link>
+                         <Link to="/partner" className="text-gray-700 hover:text-blue-800 transition-colors">
+             Partner & Services
+            </Link>
+
             
             {isAuthenticated ? (
               <div className="relative group">

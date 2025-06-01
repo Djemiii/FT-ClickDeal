@@ -13,6 +13,8 @@ import RegisterPage from './pages/RegisterPage';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import MainDashboard from './components/Dashboard/MainDashboard';
+import BusinessPage from './pages/BusinessPage';
+import PartnersPage from './pages/partner';
 
 function AppContent() {
   const location = useLocation();
@@ -26,6 +28,8 @@ function AppContent() {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/enterprise" element={<BusinessPage />} />
+          <Route path="/partner" element={<PartnersPage />} />
           <Route path="/coupons" element={<CouponListingPage />} />
           <Route path="/coupons/:id" element={<CouponDetailPage />} />
           <Route path="/fortune-wheel" element={<FortuneWheelPage />} />

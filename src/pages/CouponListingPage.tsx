@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import { useCoupons } from "../hooks/useCoupons"
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import CouponCard from '../components/coupon/CouponCard';
 import CouponFilter from '../components/coupon/CouponFilter';
+import { categories, locations } from '../data/mockData';
 import { Coupon } from '../types/coupon';
-import { mockCoupons, categories, locations } from '../data/mockData';
+import CouponOverlay from "../components/shared/CouponOverlay";
 
 const CouponListingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const {data:allCouponsData,isPending}=useCoupons()
+
+    useEffect(() => {
+      if (allCouponsData && Array.isArray(allCouponsData.data)) {
+        setCoupons(allCouponsData.data || [])
+      }
+    }, [allCouponsData])
   const [filteredCoupons, setFilteredCoupons] = useState<Coupon[]>([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   // Initialize filters from URL params
   const initialSearch = searchParams.get('search') || '';
@@ -17,14 +26,7 @@ const CouponListingPage: React.FC = () => {
   const initialLocation = searchParams.get('location') || '';
   const initialMinDiscount = parseInt(searchParams.get('minDiscount') || '0', 10);
 
-  useEffect(() => {
-    // In a real app, this would fetch data from an API
-    // For now, we'll use mock data
-    setTimeout(() => {
-      setCoupons(mockCoupons);
-      setLoading(false);
-    }, 500);
-  }, []);
+ 
 
   useEffect(() => {
     // Apply initial filters from URL
@@ -36,7 +38,7 @@ const CouponListingPage: React.FC = () => {
         minDiscount: initialMinDiscount,
       });
     }
-  }, [coupons, initialSearch, initialCategory, initialLocation, initialMinDiscount]);
+  }, [coupons, initialSearch, initialCategory, initialLocation, initialMinDiscount,allCouponsData]);
 
   const handleFilterChange = (filters: {
     search: string;
@@ -97,7 +99,7 @@ const CouponListingPage: React.FC = () => {
         onFilterChange={handleFilterChange}
       />
 
-      {loading ? (
+      {isPending ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800"></div>
         </div>
@@ -112,7 +114,7 @@ const CouponListingPage: React.FC = () => {
           {filteredCoupons.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredCoupons.map(coupon => (
-                <CouponCard key={coupon.id} coupon={coupon} />
+                <CouponOverlay key={coupon.id} coupon={coupon} />
               ))}
             </div>
           ) : (

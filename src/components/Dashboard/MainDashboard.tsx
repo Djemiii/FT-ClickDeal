@@ -13,6 +13,8 @@ import SpinWheelAdmin from "./SpinWheel/SpinWheelAdmin"
 import SpinWheelGame from "../SpinWheel/SpinWheelGame"
 import SettingsPage from "./Settings/SettingsPage"
 import MyCouponsPage from "./Coupons/MyCouponsPage"
+import MyCouponsConsumerPage from "./Coupons/MyCouponsPage"
+import GameCenter from "../Games/GameCenter"
 
 const MainDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -30,7 +32,7 @@ const MainDashboard: React.FC = () => {
         if (user?.role === "entreprise") {
           return <MyCouponsPage />
         } else {
-          return <div>Page mes coupons consommateur à implémenter</div>
+          return <div><MyCouponsConsumerPage/></div>
         }
         break
       case "spin-wheel-admin":
@@ -39,7 +41,7 @@ const MainDashboard: React.FC = () => {
         }
         break
       case "spin-wheel":
-        return <SpinWheelGame />
+        return <GameCenter />
       case "dashboard":
         if (user?.role === "admin") {
           return <AdminDashboard activeTab="dashboard" />
