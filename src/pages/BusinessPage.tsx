@@ -103,8 +103,101 @@ const BusinessPage: React.FC = () => {
         </div>
       </div>
 
-      {/* How It Works Section */}
-      {/* ... (identique à ton code d’origine, je n’ai pas modifié cette partie pour garder la clarté) */}
+       <div className="py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Comment ça fonctionne?
+          </h2>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="relative">
+              {/* Timeline */}
+              <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-100"></div>
+              
+              {/* Steps */}
+              <div className="space-y-12">
+                {/* Step 1 */}
+                <div className="md:flex items-center">
+                  <div className="md:w-1/2 mb-4 md:mb-0 md:pr-12 md:text-right">
+                    <h3 className="text-xl font-semibold mb-2">Créez votre compte</h3>
+                    <p className="text-gray-600">
+                      Inscrivez-vous gratuitement et complétez le profil de votre entreprise avec toutes les informations nécessaires.
+                    </p>
+                  </div>
+                  <div className="hidden md:flex items-center justify-center relative z-10">
+                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                      1
+                    </div>
+                  </div>
+                  <div className="md:w-1/2 md:pl-12 md:hidden">
+                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                      1
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Step 2 */}
+                <div className="md:flex items-center">
+                  <div className="md:w-1/2 md:pr-12 hidden md:block"></div>
+                  <div className="hidden md:flex items-center justify-center relative z-10">
+                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                      2
+                    </div>
+                  </div>
+                  <div className="md:w-1/2 md:pl-12">
+                    <div className="md:hidden w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mb-4">
+                      2
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Créez vos coupons</h3>
+                    <p className="text-gray-600">
+                      Utilisez notre interface intuitive pour créer des coupons attractifs avec tous les détails nécessaires.
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Step 3 */}
+                <div className="md:flex items-center">
+                  <div className="md:w-1/2 mb-4 md:mb-0 md:pr-12 md:text-right">
+                    <h3 className="text-xl font-semibold mb-2">Suivez les performances</h3>
+                    <p className="text-gray-600">
+                      Consultez votre tableau de bord pour analyser les statistiques et mesurer l'efficacité de vos offres.
+                    </p>
+                  </div>
+                  <div className="hidden md:flex items-center justify-center relative z-10">
+                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                      3
+                    </div>
+                  </div>
+                  <div className="md:w-1/2 md:pl-12 md:hidden">
+                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                      3
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Step 4 */}
+                <div className="md:flex items-center">
+                  <div className="md:w-1/2 md:pr-12 hidden md:block"></div>
+                  <div className="hidden md:flex items-center justify-center relative z-10">
+                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+                      4
+                    </div>
+                  </div>
+                  <div className="md:w-1/2 md:pl-12">
+                    <div className="md:hidden w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold mb-4">
+                      4
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Optimisez vos campagnes</h3>
+                    <p className="text-gray-600">
+                      Ajustez vos offres en fonction des résultats obtenus pour maximiser votre retour sur investissement.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Pricing Section */}
       <div className="py-16 bg-gray-50">
