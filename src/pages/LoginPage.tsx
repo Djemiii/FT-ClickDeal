@@ -220,7 +220,8 @@ const LoginPage: React.FC = () => {
       window.location.href = "/dashboard"
 
     } catch (err: any) {
-      console.error("Login error:", err)
+      
+        console.log("Login error:", err)
       setError(err.message || "Email ou mot de passe incorrect")
     }
   }
@@ -304,16 +305,16 @@ const LoginPage: React.FC = () => {
             </div>
 
             <div>
-              <button
+              <div
               onClick={handleSubmit}
-                type="submit"
-                disabled={login.isPending}
+    
+                // disabled={login.isPending}
                 className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
                   login.isPending ? "bg-blue-400" : "bg-blue-800 hover:bg-blue-700"
                 } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
               >
                 {login.isPending ? "Connexion en cours..." : "Se connecter"}
-              </button>
+              </div>
             </div>
           </form>
 

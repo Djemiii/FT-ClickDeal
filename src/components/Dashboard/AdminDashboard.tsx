@@ -1,19 +1,30 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Users, FileText, CheckCircle, Trash2, Search, Filter, Calendar, MapPin, Tag } from "lucide-react"
 import { usePendingCoupons, useApproveCoupon, useAdminDeleteCoupon, useAllUsers } from "../../hooks/useAdmin"
+import { CouponType } from "@/hooks/useCoupons"
+import { User } from "@/hooks/useUsers"
 
 const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"pending" | "users">("pending")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("")
 
-  const { data: pendingCoupons, isLoading: loadingCoupons } = usePendingCoupons()
-  const { data: users, isLoading: loadingUsers } = useAllUsers()
+  const { data: allPendingCoupons, isLoading: loadingCoupons } = usePendingCoupons()
+const [pendingCoupons,setPendingCoupons]=useState<CouponType[]>([])
+  useEffect(() => {
+    setPendingCoupons(Array.isArray(allPendingCoupons?.coupons) ? allPendingCoupons.coupons : []);
+  }, [allPendingCoupons]);
+  const { data: allUsers, isLoading: loadingUsers } = useAllUsers()
+  const [users,setUsers]=useState<User[]>([])
+  useEffect(() => {
+    setUsers(Array.isArray(allUsers?.users) ? allUsers.users : []);
+  }, [allUsers]);
   const approveCoupon = useApproveCoupon()
   const deleteCoupon = useAdminDeleteCoupon()
+  console.log(pendingCoupons,users);
 
   const handleApproveCoupon = async (id: string) => {
     try {
@@ -35,15 +46,17 @@ const AdminDashboard: React.FC = () => {
     }
   }
 
-  const filteredCoupons = pendingCoupons?.filter((coupon) => {
-    const matchesSearch =
-      coupon.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      coupon.company.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = !selectedCategory || coupon.category === selectedCategory
-    return matchesSearch && matchesCategory
-  })
+  const filteredCoupons = Array.isArray(pendingCoupons) &&
+    pendingCoupons?.filter((coupon) => {
+      const matchesSearch =
+        coupon.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        coupon.company.name.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesCategory = !selectedCategory || coupon.category === selectedCategory
+      return matchesSearch && matchesCategory
+    })
 
-  const categories = [...new Set(pendingCoupons?.map((coupon) => coupon.category) || [])]
+  const categories = [...new Set(Array.isArray(pendingCoupons) &&
+    pendingCoupons?.map((coupon) => coupon.category) || [])]
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -88,7 +101,8 @@ const AdminDashboard: React.FC = () => {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Entreprises</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {users?.filter((user) => user.role === "entreprise").length || 0}
+                  {Array.isArray(users) &&
+                    users?.filter((user) => user.role === "entreprise").length || 0}
                 </p>
               </div>
             </div>
@@ -102,7 +116,8 @@ const AdminDashboard: React.FC = () => {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Consommateurs</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {users?.filter((user) => user.role === "consommateur").length || 0}
+                  {Array.isArray(users) &&
+                    users?.filter((user) => user.role === "consommateur").length || 0}
                 </p>
               </div>
             </div>
@@ -115,21 +130,19 @@ const AdminDashboard: React.FC = () => {
             <nav className="-mb-px flex">
               <button
                 onClick={() => setActiveTab("pending")}
-                className={`py-4 px-6 border-b-2 font-medium text-sm ${
-                  activeTab === "pending"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
+                className={`py-4 px-6 border-b-2 font-medium text-sm ${activeTab === "pending"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 Coupons en attente ({pendingCoupons?.length || 0})
               </button>
               <button
                 onClick={() => setActiveTab("users")}
-                className={`py-4 px-6 border-b-2 font-medium text-sm ${
-                  activeTab === "users"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
+                className={`py-4 px-6 border-b-2 font-medium text-sm ${activeTab === "users"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
               >
                 Utilisateurs ({users?.length || 0})
               </button>
@@ -174,78 +187,80 @@ const AdminDashboard: React.FC = () => {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                     <p className="mt-2 text-gray-600">Chargement des coupons...</p>
                   </div>
-                ) : filteredCoupons?.length === 0 ? (
+                ) : Array.isArray(filteredCoupons) &&
+                  filteredCoupons?.length === 0 ? (
                   <div className="text-center py-8">
                     <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600">Aucun coupon en attente</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {filteredCoupons?.map((coupon) => (
-                      <div
-                        key={coupon._id}
-                        className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-4 mb-3">
-                              <h3 className="text-lg font-semibold text-gray-900">{coupon.title}</h3>
-                              <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                -{coupon.discount}%
-                              </span>
+                    {Array.isArray(filteredCoupons) &&
+                      filteredCoupons?.map((coupon) => (
+                        <div
+                          key={coupon._id}
+                          className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-4 mb-3">
+                                <h3 className="text-lg font-semibold text-gray-900">{coupon.title}</h3>
+                                <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                  -{coupon.discount}%
+                                </span>
+                              </div>
+
+                              <p className="text-gray-600 mb-4">{coupon.description}</p>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
+                                <div className="flex items-center">
+                                  <Tag className="h-4 w-4 mr-2" />
+                                  <span>{coupon.category}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <MapPin className="h-4 w-4 mr-2" />
+                                  <span>{coupon.location}</span>
+                                </div>
+                                <div className="flex items-center">
+                                  <Calendar className="h-4 w-4 mr-2" />
+                                  <span>Jusqu'au {new Date(coupon.endDate).toLocaleDateString("fr-FR")}</span>
+                                </div>
+                              </div>
+
+                              <div className="mt-4 text-sm text-gray-500">
+                                <p>
+                                  <strong>Entreprise:</strong> {coupon.company.name}
+                                </p>
+                                <p>
+                                  <strong>Conditions:</strong> {coupon.conditions}
+                                </p>
+                                <p>
+                                  <strong>Créé le:</strong> {new Date(coupon.createdAt).toLocaleDateString("fr-FR")}
+                                </p>
+                              </div>
                             </div>
 
-                            <p className="text-gray-600 mb-4">{coupon.description}</p>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
-                              <div className="flex items-center">
-                                <Tag className="h-4 w-4 mr-2" />
-                                <span>{coupon.category}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <MapPin className="h-4 w-4 mr-2" />
-                                <span>{coupon.location}</span>
-                              </div>
-                              <div className="flex items-center">
-                                <Calendar className="h-4 w-4 mr-2" />
-                                <span>Jusqu'au {new Date(coupon.endDate).toLocaleDateString("fr-FR")}</span>
-                              </div>
+                            <div className="flex flex-col gap-2 ml-6">
+                              <button
+                                onClick={() => handleApproveCoupon(coupon._id)}
+                                disabled={approveCoupon.isPending}
+                                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Approuver
+                              </button>
+                              <button
+                                onClick={() => handleDeleteCoupon(coupon._id)}
+                                disabled={deleteCoupon.isPending}
+                                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Supprimer
+                              </button>
                             </div>
-
-                            <div className="mt-4 text-sm text-gray-500">
-                              <p>
-                                <strong>Entreprise:</strong> {coupon.company}
-                              </p>
-                              <p>
-                                <strong>Conditions:</strong> {coupon.conditions}
-                              </p>
-                              <p>
-                                <strong>Créé le:</strong> {new Date(coupon.createdAt).toLocaleDateString("fr-FR")}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col gap-2 ml-6">
-                            <button
-                              onClick={() => handleApproveCoupon(coupon._id)}
-                              disabled={approveCoupon.isPending}
-                              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
-                            >
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Approuver
-                            </button>
-                            <button
-                              onClick={() => handleDeleteCoupon(coupon._id)}
-                              disabled={deleteCoupon.isPending}
-                              className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Supprimer
-                            </button>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
               </div>
@@ -278,7 +293,7 @@ const AdminDashboard: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {users?.map((user) => (
+                        {Array.isArray(users) && users?.map((user) => (
                           <tr key={user._id} className="hover:bg-gray-50">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
@@ -295,11 +310,10 @@ const AdminDashboard: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.email}</td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span
-                                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                  user.role === "entreprise"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : "bg-green-100 text-green-800"
-                                }`}
+                                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.role === "entreprise"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-green-100 text-green-800"
+                                  }`}
                               >
                                 {user.role}
                               </span>

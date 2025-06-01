@@ -16,6 +16,7 @@ const NotificationCenter: React.FC = () => {
   const markAllAsRead = useMarkAllNotificationsRead()
   const deleteNotification = useDeleteNotification()
   const deleteAllNotifications = useDeleteAllNotifications()
+console.log(notifications);
 
   const handleMarkAsRead = async (id: string) => {
     try {

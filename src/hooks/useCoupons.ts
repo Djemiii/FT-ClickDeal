@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "../lib/api"
 
-interface Coupon {
+export interface Coupon {
   _id: string
   title: string
   description: string
@@ -16,9 +16,30 @@ interface Coupon {
   views: number
   downloads: number
   conversions: number
-  company: string
+  company:{_id:string;email:string;name:string}
   createdAt: string
   updatedAt: string
+  
+}
+export interface CouponType {
+  _id: string
+  title: string
+  description: string
+  discount: number
+  category: string
+  location: string
+  startDate: string
+  endDate: string
+  conditions: string
+  isActive: boolean
+  approved: boolean
+  views: number
+  downloads: number
+  conversions: number
+  company:{_id:string;email:string;name:string}
+  createdAt: string
+  updatedAt: string
+  
 }
 
 interface CreateCouponData {
@@ -101,6 +122,7 @@ export const useCreateCoupon = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["coupons"] })
+      queryClient.invalidateQueries({ queryKey: ["myCoupons"] })
     },
   })
 }
@@ -121,6 +143,7 @@ export const useUpdateCoupon = () => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["coupon", id] })
       queryClient.invalidateQueries({ queryKey: ["coupons"] })
+      queryClient.invalidateQueries({ queryKey: ["myCoupons"] })
     },
   })
 }
@@ -139,6 +162,7 @@ export const useDeleteCoupon = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["coupons"] })
+      queryClient.invalidateQueries({ queryKey: ["myCoupons"] })
     },
   })
 }
