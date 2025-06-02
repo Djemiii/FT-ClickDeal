@@ -1,23 +1,6 @@
 import axios from "axios"
 
-// Configuration automatique selon l'environnement
-const getApiUrl = () => {
-  // Si on a défini VITE_API_URL, on l'utilise
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL
-  }
-  
-  // Sinon, automatique selon l'environnement
-  if (import.meta.env.PROD) {
-    return "https://clickdeal.onrender.com/api"  // Production
-  }
-  
-  return "http://localhost:8080/api"  // Développement
-}
-
-const API_BASE_URL = getApiUrl()
-
-console.log("🔗 API URL:", API_BASE_URL) // Pour débugger
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api"
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
