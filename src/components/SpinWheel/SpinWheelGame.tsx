@@ -360,7 +360,7 @@ const SpinWheelGame: React.FC = () => {
 
   useEffect(() => {
     // Filtrer seulement les coupons exclusifs et actifs
-    const exclusiveCoupons = allCoupons.filter(
+    const exclusiveCoupons =Array.isArray(allCoupons) && allCoupons.filter(
       coupon => coupon.isExclusive && coupon.isActive && coupon.approved
     )
 
@@ -368,7 +368,7 @@ const SpinWheelGame: React.FC = () => {
     const wheelPrizes: WheelPrize[] = []
     
     // Ajouter les coupons exclusifs (maximum 6 pour une belle roue)
-    const couponsToShow = exclusiveCoupons.slice(0, 6)
+    const couponsToShow = Array.isArray(exclusiveCoupons) && exclusiveCoupons.slice(0, 6)
     couponsToShow.forEach((coupon, index) => {
       wheelPrizes.push({
         id: coupon._id,
@@ -596,9 +596,9 @@ const SpinWheelGame: React.FC = () => {
                 Mes derniers gains
               </h3>
 
-              {history && history.length > 0 ? (
+              {Array.isArray(history) && history && history.length > 0 ? (
                 <div className="space-y-3">
-                  {history.slice(0, 5).map((item, index) => (
+                  {Array.isArray(history) && history.slice(0, 5).map((item, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center">
                         <span className="text-2xl mr-3">{getPrizeIcon(item.type)}</span>
@@ -633,16 +633,16 @@ const SpinWheelGame: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total spins:</span>
-                  <span className="font-medium">{history?.length || 0}</span>
+                  <span className="font-medium">{Array.isArray(history) && history?.length || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Coupons gagnés:</span>
-                  <span className="font-medium">{history?.filter((h) => h.type !== "nothing").length || 0}</span>
+                  <span className="font-medium">{Array.isArray(history) && history?.filter((h) => h.type !== "nothing").length || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Taux de réussite:</span>
                   <span className="font-medium">
-                    {history?.length
+                    {Array.isArray(history) && history?.length
                       ? Math.round((history.filter((h) => h.type !== "nothing").length / history.length) * 100)
                       : 0}
                     %
