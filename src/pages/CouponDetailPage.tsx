@@ -1,60 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Clock, MapPin, Percent, Store, ShoppingBag, Share2 } from 'lucide-react';
-import QRCodeGenerator from '../components/qrcode/QRCodeGenerator';
-import { Coupon } from '../types/coupon';
-import { mockCoupons } from '../data/mockData';
-import { useAuth } from '../contexts/AuthContext';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Coupon } from '../hooks/useCoupons';
+import { useCoupons } from '../hooks/useCoupons';
 
 const CouponDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isCouponActivated, setIsCouponActivated] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { data: allCouponsData, isPending } = useCoupons();
 
   useEffect(() => {
-    // In a real app, this would fetch data from an API
-    // For now, we'll use mock data
-    setTimeout(() => {
-      const foundCoupon = mockCoupons.find(c => c.id === id);
+     //@ts-ignore
+    if (allCouponsData && Array.isArray(allCouponsData.data) && id) {
+       //@ts-ignore
+      const foundCoupon = allCouponsData.data.find((c: Coupon) => c._id === id);
       setCoupon(foundCoupon || null);
       setLoading(false);
-    }, 500);
-  }, [id]);
-
-  const handleActivateCoupon = () => {
-    if (!isAuthenticated) {
-      // Redirect to login page
-      window.location.href = `/login?redirect=/coupons/${id}`;
-      return;
     }
-    
-    // In a real app, this would make an API call
-    setIsCouponActivated(true);
+  }, [allCouponsData, id]);
+
+  const handleGoBack = () => {
+    navigate('/coupons');
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: coupon?.title,
-        text: coupon?.description,
-        url: window.location.href,
-      })
-        .then(() => console.log('Successful share'))
-        .catch((error) => console.log('Error sharing:', error));
-    } else {
-      // Fallback for browsers that don't support navigator.share
-      navigator.clipboard.writeText(window.location.href)
-        .then(() => alert('Lien copié dans le presse-papier !'))
-        .catch((error) => console.error('Could not copy link:', error));
+  const handleDownload = () => {
+    if (coupon) {
+      // Logique pour télécharger le coupon
+      console.log('Téléchargement du coupon:', coupon._id);
     }
   };
 
-  if (loading) {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const isExpired = (endDate: string) => {
+    return new Date(endDate) < new Date();
+  };
+
+  if (isPending || loading) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="flex justify-center items-center">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800"></div>
         </div>
       </div>
@@ -63,112 +56,161 @@ const CouponDetailPage: React.FC = () => {
 
   if (!coupon) {
     return (
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Coupon introuvable</h2>
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <h3 className="text-xl font-medium text-gray-800 mb-2">Coupon non trouvé</h3>
           <p className="text-gray-600 mb-6">
-            Le coupon que vous recherchez n'existe pas ou a expiré.
+            Le coupon que vous recherchez n'existe pas ou a été supprimé.
           </p>
-          <Link
-            to="/coupons"
+          <button
+            onClick={handleGoBack}
             className="px-4 py-2 bg-blue-800 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
-            Voir tous les coupons
-          </Link>
+            Retour aux coupons
+          </button>
         </div>
       </div>
     );
   }
 
+  const expired = isExpired(coupon.endDate);
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        {/* Coupon Header */}
-        <div
-          className="h-64 bg-cover bg-center relative"
-          style={{ backgroundImage: `url(${coupon.imageUrl})` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6">
-            <div className="flex items-center mb-2">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-800 text-white">
-                <Percent className="h-3 w-3 mr-1" />
-                {coupon.discountRate}% de réduction
-              </span>
-              <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
-                {coupon.category}
-              </span>
+      {/* Bouton retour */}
+      <button
+        onClick={handleGoBack}
+        className="flex items-center text-blue-800 hover:text-blue-700 mb-6 transition-colors"
+      >
+        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Retour aux coupons
+      </button>
+
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        {/* Header avec titre et badges */}
+        <div className="bg-gradient-to-r from-blue-800 to-blue-600 text-white p-6">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold mb-2">{coupon.title}</h1>
+              <p className="text-blue-100 text-lg">{coupon.company.name}</p>
             </div>
-            <h1 className="text-3xl font-bold text-white">{coupon.title}</h1>
-            <div className="flex flex-wrap items-center mt-2 text-white/90 text-sm">
-              <div className="flex items-center mr-4">
-                <Store className="h-4 w-4 mr-1" />
-                <span>{coupon.businessName}</span>
+            <div className="flex flex-col items-end space-y-2">
+              <div className="bg-white text-blue-800 px-4 py-2 rounded-full font-bold text-2xl">
+                -{coupon.discount}%
               </div>
-              <div className="flex items-center mr-4">
-                <MapPin className="h-4 w-4 mr-1" />
-                <span>{coupon.location}</span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                <span>Valide jusqu'au {new Date(coupon.expiryDate).toLocaleDateString()}</span>
-              </div>
+              {coupon.isExclusive && (
+                <span className="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-medium">
+                  Exclusif
+                </span>
+              )}
+              {expired && (
+                <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  Expiré
+                </span>
+              )}
+              {!coupon.isActive && (
+                <span className="bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                  Inactif
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Coupon Body */}
+        {/* Contenu principal */}
         <div className="p-6">
-          <div className="flex flex-col md:flex-row gap-8">
-            <div className="flex-grow">
-              <h2 className="text-xl font-semibold mb-4">Description</h2>
-              <p className="text-gray-700 mb-6">{coupon.description}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Colonne principale */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Description */}
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800 mb-3">Description</h2>
+                <p className="text-gray-600 leading-relaxed">{coupon.description}</p>
+              </div>
 
-              {coupon.termsAndConditions && (
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold mb-4">Conditions d'utilisation</h2>
-                  <p className="text-gray-700 whitespace-pre-line">{coupon.termsAndConditions}</p>
+              {/* Conditions */}
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800 mb-3">Conditions d'utilisation</h2>
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+                  <p className="text-gray-700">{coupon.conditions}</p>
                 </div>
-              )}
+              </div>
+
+              {/* Statistiques */}
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800 mb-3">Statistiques</h2>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold text-blue-800">{coupon.views}</div>
+                    <div className="text-sm text-gray-600">Vues</div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold text-green-600">{coupon.downloads}</div>
+                    <div className="text-sm text-gray-600">Téléchargements</div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg text-center">
+                    <div className="text-2xl font-bold text-purple-600">{coupon.conversions}</div>
+                    <div className="text-sm text-gray-600">Conversions</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="md:w-80 bg-gray-50 rounded-lg p-6 self-start">
-              {isCouponActivated ? (
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold mb-4">Votre coupon est activé!</h3>
-                  <div className="mb-4">
-                    <QRCodeGenerator
-                      value={`clickdeal:coupon:${coupon.id}`}
-                      size={200}
-                    />
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Informations rapides */}
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Informations</h3>
+                <div className="space-y-3">
+                  <div>
+                    <span className="font-medium text-gray-700">Catégorie:</span>
+                    <span className="ml-2 text-gray-600">{coupon.category}</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Présentez ce QR code au commerçant pour bénéficier de votre réduction.
-                  </p>
+                  <div>
+                    <span className="font-medium text-gray-700">Localisation:</span>
+                    <span className="ml-2 text-gray-600">{coupon.location}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-700">Début:</span>
+                    <span className="ml-2 text-gray-600">{formatDate(coupon.startDate)}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-700">Fin:</span>
+                    <span className={`ml-2 ${expired ? 'text-red-600 font-medium' : 'text-gray-600'}`}>
+                      {formatDate(coupon.endDate)}
+                    </span>
+                  </div>
                 </div>
-              ) : (
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold mb-4">Activez ce coupon</h3>
-                  <button
-                    onClick={handleActivateCoupon}
-                    className="w-full mb-4 px-4 py-3 bg-blue-800 text-white rounded-md font-medium hover:bg-blue-700 flex items-center justify-center"
-                  >
-                    <ShoppingBag className="h-5 w-5 mr-2" />
-                    Activer le coupon
-                  </button>
-                  <p className="text-sm text-gray-600">
-                    Une fois activé, vous pourrez présenter ce coupon en magasin.
-                  </p>
-                </div>
-              )}
+              </div>
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <button
-                  onClick={handleShare}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 flex items-center justify-center hover:bg-gray-50"
-                >
-                  <Share2 className="h-5 w-5 mr-2" />
-                  Partager ce coupon
-                </button>
+              {/* Action principale */}
+              <div className="sticky top-6">
+                {!expired && coupon.isActive ? (
+                  <button
+                    onClick={handleDownload}
+                    className="w-full bg-blue-800 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                  >
+                    Télécharger le coupon
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    className="w-full bg-gray-400 text-white py-3 px-6 rounded-lg font-semibold cursor-not-allowed"
+                  >
+                    {expired ? 'Coupon expiré' : 'Coupon indisponible'}
+                  </button>
+                )}
+                
+                {/* Informations entreprise */}
+                <div className="mt-6 p-4 border rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">Proposé par</h4>
+                  <div className="text-gray-600">
+                    <p className="font-medium">{coupon.company.name}</p>
+                    <p className="text-sm">{coupon.company.email}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

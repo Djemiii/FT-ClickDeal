@@ -100,7 +100,7 @@ import {
   Store,
 } from "lucide-react";
 import React, { useState } from "react";
-import { QrReader } from "react-qr-reader";
+import { useNavigate } from "react-router-dom";
 
 interface Coupon {
   _id: string;
@@ -121,7 +121,8 @@ interface Coupon {
 
 const CouponOverlay: React.FC<{ coupon: Coupon }> = ({ coupon }) => {
   const [showQR, setShowQR] = useState(false);
-
+const [copied, setCopied] = useState(false);
+const navigate = useNavigate();
   // Couleurs dynamiques basées sur la catégorie
   const getCategoryColor = (category: string) => {
     const colors = {
@@ -230,14 +231,17 @@ const CouponOverlay: React.FC<{ coupon: Coupon }> = ({ coupon }) => {
             </div>
 
             <div className="flex justify-center space-x-2">
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(coupon.code);
-                }}
-                className="text-xs px-3 py-1 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition"
-              >
-                Copier le code
-              </button>
+             <button
+  onClick={() => {
+    navigator.clipboard.writeText(coupon.code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }}
+  className="text-xs px-3 py-1 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition"
+>
+  {copied ? "Code copié !" : "Copier le code"}
+</button>
+
 
               <a
                 href={coupon.qrCode}
@@ -263,12 +267,12 @@ const CouponOverlay: React.FC<{ coupon: Coupon }> = ({ coupon }) => {
             </div>
           </div>
           <button
-            onClick={() => setShowQR(!showQR)}
+            onClick={() => navigate(`/coupons/${coupon._id}`)}
             className={`bg-gradient-to-r ${getCategoryColor(
               coupon.category
             )} text-white px-6 py-2 rounded-full font-medium text-sm hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200`}
           >
-            Utiliser
+            Details
           </button>
         </div>
       </div>

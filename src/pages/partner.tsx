@@ -1,15 +1,9 @@
 'use client';
+import { BadgePercent, Building2, Info, Users } from 'lucide-react';
 import React from 'react';
-import Header from '@/components/common/Header';
-import { Building2, BadgePercent, Users, Info } from 'lucide-react';
-import { useCoupons } from "../hooks/useCoupons"
+import { useCoupons } from "../hooks/useCoupons";
 
-const partners = [
-  { name: 'Café Gourmand', description: 'Restaurant convivial au cœur de la ville', category: 'Restaurants' },
-  { name: 'Beauty Luxe', description: 'Salon de beauté et spa haut de gamme', category: 'Beauté' },
-  { name: 'TechZone', description: 'Boutique spécialisée en électronique', category: 'Électronique' },
-  { name: 'Style Urbain', description: 'Mode et accessoires tendance', category: 'Mode' },
-];
+
 
 const categories = [
   'Restaurants',

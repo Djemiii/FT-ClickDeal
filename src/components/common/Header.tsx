@@ -35,10 +35,10 @@ const Header: React.FC = () => {
               Roue de la Fortune
             </Link>
              <Link to="/enterprise" className="text-gray-700 hover:text-blue-800 transition-colors">
-             Entreprise
+             Pour les Entreprises
             </Link>
                          <Link to="/partner" className="text-gray-700 hover:text-blue-800 transition-colors">
-             Partner & Services
+             Nos Partenaires
             </Link>
 
             

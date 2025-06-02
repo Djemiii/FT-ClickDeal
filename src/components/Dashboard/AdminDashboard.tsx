@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client"
 
 import type React from "react"
@@ -15,11 +17,13 @@ const AdminDashboard: React.FC = () => {
   const { data: allPendingCoupons, isLoading: loadingCoupons } = usePendingCoupons()
 const [pendingCoupons,setPendingCoupons]=useState<CouponType[]>([])
   useEffect(() => {
+    //@ts-ignore
     setPendingCoupons(Array.isArray(allPendingCoupons?.coupons) ? allPendingCoupons.coupons : []);
   }, [allPendingCoupons]);
   const { data: allUsers, isLoading: loadingUsers } = useAllUsers()
   const [users,setUsers]=useState<User[]>([])
   useEffect(() => {
+     //@ts-ignore
     setUsers(Array.isArray(allUsers?.users) ? allUsers.users : []);
   }, [allUsers]);
   const approveCoupon = useApproveCoupon()
@@ -30,7 +34,9 @@ const [pendingCoupons,setPendingCoupons]=useState<CouponType[]>([])
     try {
       await approveCoupon.mutateAsync(id)
       alert("Coupon approuvé avec succès!")
-    } catch (error) {
+       //@ts-ignore
+    } catch (error:any) {
+      console.error("Erreur lors de l'approbation du coupon:", error)
       alert("Erreur lors de l'approbation du coupon")
     }
   }
@@ -41,6 +47,7 @@ const [pendingCoupons,setPendingCoupons]=useState<CouponType[]>([])
         await deleteCoupon.mutateAsync(id)
         alert("Coupon supprimé avec succès!")
       } catch (error) {
+        console.error("Erreur lors de la suppression du coupon:", error)
         alert("Erreur lors de la suppression du coupon")
       }
     }

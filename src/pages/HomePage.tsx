@@ -1,21 +1,22 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { Award, Heart, MapPin, Search, ShoppingBag, TrendingUp, Users } from "lucide-react"
 import type React from "react"
-import { useState, useEffect } from "react"
-import { ShoppingBag, MapPin, Search, TrendingUp, Users, Award, Heart } from "lucide-react"
+import { useEffect, useState } from "react"
 
 import { Coupon } from "@/types/coupon"
-import SnowEffect from "../components/shared/SnowEffect"
+import AppLoader from "../components/shared/AppLoader"
 import CouponOverlay from "../components/shared/CouponOverlay"
 import Pagination from "../components/shared/Pagination"
+import SnowEffect from "../components/shared/SnowEffect"
 import TestimonialCarousel from "../components/shared/TestimonialCarousel"
-import AppLoader from "../components/shared/AppLoader"
 import { useCoupons } from "../hooks/useCoupons"
-import { all } from "axios"
 
 
 
 const HomePage: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(true)
   const [featuredCoupons, setFeaturedCoupons] = useState<Coupon[]>([])
   const [trendingCoupons, setTrendingCoupons] = useState<Coupon[]>([])
@@ -25,7 +26,9 @@ const HomePage: React.FC = () => {
 const {data:allCouponsData,isPending}=useCoupons()
 const [allCoupons,setAllCoupons]=useState<Coupon[]>([])
   useEffect(() => {
+     //@ts-ignore
     if (allCouponsData && Array.isArray(allCouponsData.data)) {
+       //@ts-ignore
       setAllCoupons(allCouponsData.data || [])
     }
   }, [allCouponsData])

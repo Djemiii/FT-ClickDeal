@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import type React from "react"
@@ -17,6 +19,7 @@ const ConsumerDashboard: React.FC = () => {
     category: selectedCategory,
     location: location,
   })
+  //@ts-ignore
   const coupons = Array.isArray(couponsAll?.data) ? couponsAll.data : []
   const { data: spinHistory } = useSpinHistory()
 
@@ -61,7 +64,7 @@ const ConsumerDashboard: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Coupons utilisés</p>
               <p className="text-2xl font-bold text-gray-900">
-                {spinHistory?.filter((h) => h.type !== "nothing").length || 0}
+                {Array.isArray(spinHistory) && spinHistory?.filter((h) => h.type !== "nothing").length || 0}
               </p>
             </div>
           </div>
@@ -166,8 +169,8 @@ const ConsumerDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold mb-2">Offres du jour</h3>
-              <p className="text-green-100 mb-4">12 nouvelles offres disponibles</p>
-              <button className="bg-white text-green-600 px-4 py-2 rounded-lg font-medium hover:bg-green-50 transition-colors">
+              <p className="text-green-100 mb-4">8 nouvelles offres disponibles</p>
+              <button disabled className="bg-white text-green-600 px-4 py-2 rounded-lg font-medium hover:bg-green-50 transition-colors">
                 Découvrir
               </button>
             </div>
@@ -179,8 +182,8 @@ const ConsumerDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold mb-2">Mes favoris</h3>
-              <p className="text-orange-100 mb-4">5 coupons sauvegardés</p>
-              <button className="bg-white text-orange-600 px-4 py-2 rounded-lg font-medium hover:bg-orange-50 transition-colors">
+              <p className="text-orange-100 mb-4">0 coupons sauvegardés</p>
+              <button disabled className="bg-white text-orange-600 px-4 py-2 rounded-lg font-medium hover:bg-orange-50 transition-colors">
                 Voir tout
               </button>
             </div>
@@ -204,7 +207,7 @@ const ConsumerDashboard: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {recentCoupons.map((coupon) => (
+            {recentCoupons?.slice(0, 8).map((coupon) => (
               <CouponOverlay key={coupon._id} coupon={coupon} />
             ))}
           </div>
@@ -212,7 +215,7 @@ const ConsumerDashboard: React.FC = () => {
       </div>
 
       {/* Coupons populaires */}
-      <div className="mb-8">
+      {/* <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Coupons populaires</h2>
           <button className="text-blue-600 hover:text-blue-700 font-medium">Voir tout →</button>
@@ -223,7 +226,7 @@ const ConsumerDashboard: React.FC = () => {
             <CouponOverlay key={coupon._id} coupon={coupon} />
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Historique récent */}
       {spinHistory && spinHistory.length > 0 && (

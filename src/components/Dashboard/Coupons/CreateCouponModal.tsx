@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
@@ -22,6 +23,7 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
     startDate: "",
     endDate: "",
     conditions: "",
+    isExclusive: false,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -81,6 +83,7 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
         startDate: "",
         endDate: "",
         conditions: "",
+        isExclusive: false,
       })
       setErrors({})
     } catch (error: any) {
@@ -100,6 +103,7 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
       startDate: "",
       endDate: "",
       conditions: "",
+      isExclusive: false,
     })
     setErrors({})
   }
@@ -237,6 +241,18 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Ex: Valable du lundi au vendredi, non cumulable..."
             />
+          </div>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="isExclusive"
+              checked={formData.isExclusive}
+              onChange={(e) => setFormData({ ...formData, isExclusive: e.target.checked })}
+              className="mr-2"
+            />
+            <label htmlFor="isExclusive" className="text-sm text-gray-700">
+              Cet offre est exclusive aux utilisateurs de ClickDeal
+            </label>
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import type React from "react"
@@ -63,8 +65,8 @@ const CompanyDashboard: React.FC = () => {
     }
   }
 
-  const activeCoupons = coupons?.filter((coupon) => coupon.isActive && coupon.approved) || []
-  const pendingCoupons = coupons?.filter((coupon) => !coupon.approved) || []
+  const activeCoupons = Array.isArray(coupons) && coupons?.filter((coupon) =>  coupon.isApproved) || []
+  const pendingCoupons =Array.isArray(coupons) && coupons?.filter((coupon) => !coupon.isApproved) || []
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

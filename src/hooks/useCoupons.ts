@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "../lib/api"
 
@@ -19,6 +20,8 @@ export interface Coupon {
   company:{_id:string;email:string;name:string}
   createdAt: string
   updatedAt: string
+  isExclusive?: boolean
+  isApproved: boolean
   
 }
 export interface CouponType {
@@ -39,6 +42,7 @@ export interface CouponType {
   company:{_id:string;email:string;name:string}
   createdAt: string
   updatedAt: string
+  isApproved: boolean
   
 }
 

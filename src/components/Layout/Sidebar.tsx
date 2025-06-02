@@ -1,24 +1,22 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
 import {
-  LayoutDashboard,
-  FileText,
-  Users,
-  Settings,
+  BarChart3,
   Bell,
-  LogOut,
   ChevronLeft,
   ChevronRight,
-  User,
-  BarChart3,
+  FileText,
   Gift,
-  Shield,
-  Building,
+  LayoutDashboard,
+  LogOut,
   Menu,
-  X,
+  Shield,
+  User,
+  Users,
+  X
 } from "lucide-react"
+import type React from "react"
+import { useState } from "react"
 import { useCurrentUser, useLogout } from "../../hooks/useAuth"
 
 interface SidebarProps {
@@ -53,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, userRole }) =
         { id: "pending-coupons", label: "Coupons en attente", icon: FileText },
         { id: "all-users", label: "Utilisateurs", icon: Users },
         { id: "moderation", label: "Modération", icon: Shield },
-        { id: "settings", label: "Paramètres", icon: Settings },
+        // { id: "settings", label: "Paramètres", icon: Settings },
       ]
     }
 
@@ -63,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, userRole }) =
         { id: "my-coupons", label: "Mes coupons", icon: FileText },
         { id: "create-coupon", label: "Créer un coupon", icon: Gift },
         { id: "statistics", label: "Statistiques", icon: BarChart3 },
-        { id: "company-settings", label: "Paramètres", icon: Building },
+        // { id: "company-settings", label: "Paramètres", icon: Building },
       ]
     }
 
