@@ -1,9 +1,11 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Camera, Save, User, Mail, Building, Calendar, MapPin, Phone } from "lucide-react"
 import { useCurrentUser, useUpdateUser, useUploadLogo } from "../../hooks/useAuth"
+
+const BACKEND_URL = "http://localhost:8080"
 
 const UserProfile: React.FC = () => {
   const { data: user, isLoading } = useCurrentUser()
@@ -12,15 +14,31 @@ const UserProfile: React.FC = () => {
 
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    address: user?.address || "",
-    description: user?.description || "",
-    website: user?.website || "",
-    secteurActivite: user?.secteurActivite || "",
-    logo: user?.logo || "",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    description: "",
+    website: "",
+    secteurActivite: "",
+    logo: "",
   })
+
+  // Synchronise formData avec user dès que user est chargé ou modifié
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        address: user.address || "",
+        description: user.description || "",
+        website: user.website || "",
+        secteurActivite: user.secteurActivite || "",
+        logo: user.logo || "",
+      })
+    }
+  }, [user])
 
   const handleSave = async () => {
     try {
@@ -45,7 +63,9 @@ const UserProfile: React.FC = () => {
     const file = event.target.files?.[0]
     if (file) {
       try {
-        await uploadLogo.mutateAsync(file)
+        const logoPath = await uploadLogo.mutateAsync(file)
+        // Met à jour le logo dans formData pour rafraîchir l'image affichée
+        setFormData(prev => ({ ...prev, logo: logoPath }))
         alert("Logo mis à jour avec succès!")
       } catch (error) {
         alert("Erreur lors du téléchargement du logo")
@@ -83,10 +103,10 @@ const UserProfile: React.FC = () => {
             <div className="lg:col-span-1">
               <div className="text-center">
                 <div className="relative inline-block">
-                  <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
-                    {user?.logo ? (
+                  <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4 overflow-hidden">
+                    {formData.logo ? (
                       <img
-                        src={user.logo || "/placeholder.svg"}
+                        src={`${BACKEND_URL}${formData.logo}?t=${new Date().getTime()}`}
                         alt="Logo"
                         className="w-full h-full rounded-full object-cover"
                       />
@@ -101,7 +121,7 @@ const UserProfile: React.FC = () => {
                     </label>
                   )}
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900">{user?.name}</h2>
+                <h2 className="text-xl font-semibold text-gray-900">{formData.name}</h2>
                 <p className="text-gray-600 capitalize">{user?.role}</p>
                 <div className="mt-4 flex items-center justify-center text-sm text-gray-500">
                   <Calendar className="w-4 h-4 mr-1" />
@@ -130,7 +150,7 @@ const UserProfile: React.FC = () => {
                       ) : (
                         <div className="flex items-center p-3 bg-gray-50 rounded-lg">
                           <User className="w-4 h-4 text-gray-400 mr-2" />
-                          <span>{user?.name}</span>
+                          <span>{formData.name}</span>
                         </div>
                       )}
                     </div>
@@ -147,7 +167,7 @@ const UserProfile: React.FC = () => {
                       ) : (
                         <div className="flex items-center p-3 bg-gray-50 rounded-lg">
                           <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                          <span>{user?.email}</span>
+                          <span>{formData.email}</span>
                         </div>
                       )}
                     </div>
@@ -191,73 +211,77 @@ const UserProfile: React.FC = () => {
                 </div>
 
                 {user?.role === "entreprise" && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Description de l'entreprise</label>
-                    {isEditing ? (
-                      <textarea
-                        rows={4}
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Décrivez votre entreprise..."
-                      />
-                    ) : (
-                      <div className="flex items-start p-3 bg-gray-50 rounded-lg">
-                        <Building className="w-4 h-4 text-gray-400 mr-2 mt-1" />
-                        <span>{formData.description || "Aucune description"}</span>
-                      </div>
-                    )}
-                  </div>
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Description de l'entreprise</label>
+                      {isEditing ? (
+                        <textarea
+                          rows={4}
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Décrivez votre entreprise..."
+                        />
+                      ) : (
+                        <div className="flex items-start p-3 bg-gray-50 rounded-lg">
+                          <Building className="w-4 h-4 text-gray-400 mr-2 mt-1" />
+                          <span>{formData.description || "Aucune description"}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Secteur d'activité</label>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={formData.secteurActivite}
+                          onChange={(e) => setFormData({ ...formData, secteurActivite: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Secteur d'activité"
+                        />
+                      ) : (
+                        <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                          <Building className="w-4 h-4 text-gray-400 mr-2" />
+                          <span>{formData.secteurActivite || "Non renseigné"}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Site web</label>
+                      {isEditing ? (
+                        <input
+                          type="url"
+                          value={formData.website}
+                          onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="https://"
+                        />
+                      ) : (
+                        <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                          <a
+                            href={formData.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                          >
+                            {formData.website || "Non renseigné"}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </>
                 )}
 
-                {user?.role === "entreprise" && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Secteur d'activité</label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={formData.secteurActivite}
-                        onChange={(e) => setFormData({ ...formData, secteurActivite: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Secteur d'activité"
-                      />
-                    ) : (
-                      <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <Building className="w-4 h-4 text-gray-400 mr-2" />
-                        <span>{formData.secteurActivite || "Non renseigné"}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                {user?.role === "entreprise" && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Site web</label>
-                    {isEditing ? (
-                      <input
-                        type="url"
-                        value={formData.website}
-                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="https://votre-site.com"
-                      />
-                    ) : (
-                      <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span className="text-blue-600 hover:underline">{formData.website || "Non renseigné"}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
                 {isEditing && (
-                  <div className="flex justify-end">
-                    <button
-                      onClick={handleSave}
-                      disabled={updateUser.isPending}
-                      className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      {updateUser.isPending ? "Sauvegarde..." : "Sauvegarder"}
-                    </button>
-                  </div>
+                  <button
+                    onClick={handleSave}
+                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <Save className="inline-block w-5 h-5 mr-2" />
+                    Enregistrer
+                  </button>
                 )}
               </div>
             </div>

@@ -12,7 +12,6 @@ import NotificationCenter from "../Notifications/NotificationCenter"
 import { useCurrentUser } from "../../hooks/useAuth"
 import SpinWheelAdmin from "./SpinWheel/SpinWheelAdmin"
 import SpinWheelGame from "../SpinWheel/SpinWheelGame"
-import SettingsPage from "./Settings/SettingsPage"
 import MyCouponsPage from "./Coupons/MyCouponsPage"
 import MyCouponsConsumerPage from "./Coupons/MyCouponsPage"
 

@@ -2,8 +2,8 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { X, Save } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { X, Save, AlertCircle } from "lucide-react"
 import { useCreateCoupon } from "../../../hooks/useCoupons"
 
 interface CreateCouponModalProps {
@@ -14,6 +14,7 @@ interface CreateCouponModalProps {
 
 const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const createCoupon = useCreateCoupon()
+  const modalRef = useRef<HTMLDivElement>(null)
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -26,6 +27,14 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
     isExclusive: false,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitError, setSubmitError] = useState<string>("")
+
+  // Scroll vers le haut quand une erreur apparaît
+  useEffect(() => {
+    if (submitError && modalRef.current) {
+      modalRef.current.scrollTop = 0
+    }
+  }, [submitError])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -64,6 +73,7 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitError("") // Reset error message
 
     if (!validateForm()) {
       return
@@ -86,8 +96,37 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
         isExclusive: false,
       })
       setErrors({})
+      setSubmitError("")
     } catch (error: any) {
       console.error("Erreur lors de la création:", error)
+      
+      // Extract user-friendly error message
+      let errorMessage = "Une erreur est survenue lors de la création du coupon."
+      
+      if (error?.message) {
+        if (error.message.includes("Profil incomplet")) {
+          errorMessage = "Votre profil est incomplet. Veuillez compléter votre profil (téléphone, site web, secteur d'activité, description, logo) avant de créer un coupon."
+        } else if (error.message.includes("Champs manquants")) {
+          const missingFields = error.message.match(/Champs manquants : (.+)/)?.[1]
+          if (missingFields) {
+            const fieldsTranslation: Record<string, string> = {
+              phone: "téléphone",
+              website: "site web", 
+              secteurActivite: "secteur d'activité",
+              description: "description",
+              logo: "logo"
+            }
+            const translatedFields = missingFields.split(", ").map((field: string) => 
+              fieldsTranslation[field.trim()] || field.trim()
+            ).join(", ")
+            errorMessage = `Votre profil est incomplet. Champs manquants : ${translatedFields}. Veuillez compléter votre profil avant de créer un coupon.`
+          }
+        } else {
+          errorMessage = error.message
+        }
+      }
+      
+      setSubmitError(errorMessage)
     }
   }
 
@@ -106,13 +145,17 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
       isExclusive: false,
     })
     setErrors({})
+    setSubmitError("")
   }
 
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div 
+        ref={modalRef}
+        className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900">Créer un nouveau coupon</h2>
           <button onClick={handleClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -121,6 +164,17 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Affichage de l'erreur de soumission */}
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-sm font-medium text-red-800 mb-1">Erreur</h4>
+                <p className="text-sm text-red-700">{submitError}</p>
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Titre du coupon *</label>
             <input
@@ -251,7 +305,7 @@ const CreateCouponModal: React.FC<CreateCouponModalProps> = ({ isOpen, onClose, 
               className="mr-2"
             />
             <label htmlFor="isExclusive" className="text-sm text-gray-700">
-              Cet offre est exclusive aux utilisateurs de ClickDeal
+              Ce coupon est exclusive pour la Roue de la fortune
             </label>
           </div>
 
